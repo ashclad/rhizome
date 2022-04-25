@@ -10,7 +10,7 @@ class Node:
     # Below specifies what branch/edge/link of the central/parent node one is on
     self._pathmax = 1
     self._paths = range(0, self._pathmax)
-    self._sharedpath = None
+    self._sharedtrav = None
     self._trailmax = None
     self._trails = None
     # Below specifies what position node is in, in a specific branch/edge/link
@@ -21,6 +21,12 @@ class Node:
     self.path0 = []
     self.trail0 = None
 
+  def _invert(self):
+    # TODO: Write code for exchanging the values of path-related v.
+    # trail-related attr and moving center attribute's value into trail
+    # attr
+    pass
+
   def append(self, path, node):
     if not isinstance(path, int):
       raise TypeError(custerr.standardTypeMessage('path', path, int))
@@ -29,7 +35,7 @@ class Node:
       if hasattr(self, 'path' + str(path)) and path in self._paths:
         node._center = self
 
-        node._sharedpath = path
+        node._sharedtrav = path
         node._nodeid += 1
 
         currentpath = getattr(self, 'path' + str(path))
@@ -104,7 +110,7 @@ class Node:
     # info is replaced for nodes of each currentnode[-1] path attr
 
     currentnode[-1]._nodeid = 0
-    delattr(currentnode, '_sharedpath')
+    delattr(currentnode, '_sharedtrav')
     currentnode[-1]._center = None
 
     return currentnode[-1]
