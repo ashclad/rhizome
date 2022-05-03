@@ -10,7 +10,7 @@ class Node:
     # Below specifies what branch/edge/link of the central/parent node one is on
     self._pathmax = 1
     self._paths = range(0, self._pathmax)
-    self._sharedtrav = None
+    self._sharedpath = None
     self._trailmax = None
     self._trails = None
     # Below specifies what position node is in, in a specific branch/edge/link
@@ -35,7 +35,7 @@ class Node:
       if hasattr(self, 'path' + str(path)) and path <= len(self._paths):
         node._center = self
 
-        node._sharedtrav = path
+        node._sharedpath = path
         node._nodeid += 1
 
         currentpath = getattr(self, 'path' + str(path))
@@ -111,15 +111,7 @@ class Node:
     trashed = currentpath[-1]
     del currentpath[-1]
 
-<<<<<<< HEAD
-    currentnode[-1]._nodeid = 0
-    delattr(currentnode, '_sharedtrav')
-    currentnode[-1]._center = None
-
-    return currentnode[-1]
-=======
     return trashed
->>>>>>> 2757c2e807715e51337197879f77b4005734f9dd
 
   def attach(self, node):
     self._pathmax += 1
@@ -189,7 +181,7 @@ node.append(0, node_num)
 node.attach(node_func)
 # node._move('f')
 # print(node.next)
-# node.detach()
+node.detach()
 # print(node.next)
-print(node._gather())
+# print(node._gather())
 # print(len(node))
