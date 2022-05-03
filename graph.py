@@ -113,19 +113,23 @@ class Node:
 
     return trashed
 
-  def attach(self, node):
-    self._pathmax += 1
-    self._paths = range(0, self._pathmax)
-    path = len(self._paths) - 1
-    setattr(self, 'path' + str(path), [])
+  def attach(self, node, path = None):
+    if isinstance(node, Node):
+      self._pathmax += 1
+      self._paths = range(0, self._pathmax)
+      if path is None:
+        path = len(self._paths) - 1
+      setattr(self, 'path' + str(path), [])
 
-    self.append(path, node)
+      self.append(path, node)
+    else:
+      raise TypeError(custerr.standardTypeMessage('node', node, Node))
 
-  def detach(self, forced = True):
-    # Rewrite method--too many nodes seem to be deleted
+  def detach(self, path = None, forced = True):
     self._pathmax -= 1
     self._paths = range(0, self._pathmax)
-    path = len(self._paths)
+    if path is None:
+      path = len(self._paths)
     trashed = self.pop(path)
     leftover = getattr(self, 'path' + str(path))
 
@@ -145,6 +149,24 @@ class Node:
 
   def __len__(self):
     return len(self._gather())
+
+  def __getitem__(self, key):
+    return self._gather()[key]
+
+  def __setitem__(self, key, val):
+    # TODO: Add support for tupled keys
+    if not isinstance(val, Node):
+      currentpath = getattr(self, 'path' + str(key))
+      currentpath[0].content = val
+      val = [currentpath[0]]
+      setattr(self, 'path' + str(key), val)
+    else:
+      self.detach(key)
+      self.attach(val, key)
+
+  def __delitem__(self, key):
+    # TODO: Add support for tupled keys
+    self.detach(key)
 
   def __repr__(self):
     strrepr = '*|'
@@ -181,7 +203,5 @@ node.append(0, node_num)
 node.attach(node_func)
 # node._move('f')
 # print(node.next)
-node.detach()
+# node.detach()
 # print(node.next)
-# print(node._gather())
-# print(len(node))
