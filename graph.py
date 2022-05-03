@@ -59,8 +59,6 @@ class Node:
 
     if len(coll):
       for e in range(len(coll) - 1):
-        print(e)
-        # TODO: Fix line below
         currentattr = getattr(self, id + str(e))
         if len(currentattr):
           result.append(currentattr[0])
@@ -112,29 +110,35 @@ class Node:
   def attach(self, node):
     self._pathmax += 1
     self._paths = range(0, self._pathmax)
-    path = len(self._paths)
+    path = len(self._paths) - 1
     setattr(self, 'path' + str(path), [])
 
     self.append(path, node)
 
   def detach(self, forced = True):
-    # Code likely to make use of class's pop method
+    # Rewrite method--too many nodes seem to be deleted
     self._pathmax -= 1
     self._paths = range(0, self._pathmax)
-    path = len(self._paths) - 1
+    path = len(self._paths)
     trashed = self.pop(path)
+    leftover = getattr(self, 'path' + str(path))
 
     if forced:
-      if trashed:
+      if trashed is not None:
         delattr(self, 'path' + str(path))
     else:
-      if trashed and len(trashed._paths) < 1:
+      if trashed is not None and len(trashed._paths) < 1:
         delattr(self, 'path' + str(path))
       else:
         raise RuntimeError('You cannot remove a path ' + \
         'that still contains nodes or is initial path.' + \
         ' Rerun until after all nodes are removed for ' + \
         'non-initial path.')
+
+    return leftover
+
+  def __len__(self):
+    return len(self._gather())
 
   def __repr__(self):
     strrepr = '*|'
@@ -162,14 +166,16 @@ class Graph:
   pass
 
 node = Node()
-print(node.next)
+# print(node.next)
 node_text = Node("text")
 node_num = Node(1)
-node_func = Node("bullshit")
+node_func = Node(26)
 node.append(0, node_text)
 node.append(0, node_num)
 node.attach(node_func)
 # node._move('f')
-print(node.next)
-node.detach()
-print(node.next)
+# print(node.next)
+# node.detach()
+# print(node.next)
+print(node._gather())
+# print(len(node))
