@@ -32,7 +32,7 @@ class Node:
       raise TypeError(custerr.standardTypeMessage('path', path, int))
 
     if isinstance(node, Node):
-      if hasattr(self, 'path' + str(path)) and path in self._paths:
+      if hasattr(self, 'path' + str(path)) and path <= len(self._paths):
         node._center = self
 
         node._sharedtrav = path
@@ -64,7 +64,7 @@ class Node:
       raise ValueError()
 
     if len(coll):
-      for e in coll:
+      for e in range(len(coll) - 1):
         currentattr = getattr(self, id + str(e))
         if len(currentattr):
           result.append(currentattr[0])
@@ -97,35 +97,62 @@ class Node:
       else:
         return trav_from_node
 
-  def pop(path):
-    currentnode = getattr(self, 'path' + str(path))
+  def pop(self, path):
+    currentpath = getattr(self, 'path' + str(path))
 
-    currentnode[-1]._trailmax = None
-    currentnode[-1]._trails = None
-    currentnode[-1]._trlposition = None
-    currentnode[-1].trail0 = None
+    currentpath[-1]._trailmax = None
+    currentpath[-1]._trails = None
+    currentpath[-1]._trlposition = None
+    currentpath[-1].trail0 = None
 
-    # TODO: Get currentnode[-1] path attrs and create new self path attrs
-    # with them starting at self path attr amount or 1 less--make sure all trail
-    # info is replaced for nodes of each currentnode[-1] path attr
+    currentpath[-1]._nodeid -= 1
+    delattr(currentpath[-1], '_sharedpath')
+    currentpath[-1]._center = None
+    trashed = currentpath[-1]
+    del currentpath[-1]
 
+<<<<<<< HEAD
     currentnode[-1]._nodeid = 0
     delattr(currentnode, '_sharedtrav')
     currentnode[-1]._center = None
 
     return currentnode[-1]
+=======
+    return trashed
+>>>>>>> 2757c2e807715e51337197879f77b4005734f9dd
 
   def attach(self, node):
     self._pathmax += 1
     self._paths = range(0, self._pathmax)
-    path = self._paths[-1]
+    path = len(self._paths) - 1
     setattr(self, 'path' + str(path), [])
 
     self.append(path, node)
 
-  def detach(self):
-    # Code likely to make use of class's pop method
-    pass
+  def detach(self, forced = True):
+    # Rewrite method--too many nodes seem to be deleted
+    self._pathmax -= 1
+    self._paths = range(0, self._pathmax)
+    path = len(self._paths)
+    trashed = self.pop(path)
+    leftover = getattr(self, 'path' + str(path))
+
+    if forced:
+      if trashed is not None:
+        delattr(self, 'path' + str(path))
+    else:
+      if trashed is not None and len(trashed._paths) < 1:
+        delattr(self, 'path' + str(path))
+      else:
+        raise RuntimeError('You cannot remove a path ' + \
+        'that still contains nodes or is initial path.' + \
+        ' Rerun until after all nodes are removed for ' + \
+        'non-initial path.')
+
+    return leftover
+
+  def __len__(self):
+    return len(self._gather())
 
   def __repr__(self):
     strrepr = '*|'
@@ -151,3 +178,18 @@ class Node:
 
 class Graph:
   pass
+
+node = Node()
+# print(node.next)
+node_text = Node("text")
+node_num = Node(1)
+node_func = Node(26)
+node.append(0, node_text)
+node.append(0, node_num)
+node.attach(node_func)
+# node._move('f')
+# print(node.next)
+# node.detach()
+# print(node.next)
+print(node._gather())
+# print(len(node))
