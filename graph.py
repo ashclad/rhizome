@@ -25,7 +25,33 @@ class Node:
     # TODO: Write code for exchanging the values of path-related v.
     # trail-related attr and moving center attribute's value into trail
     # attr
-    pass
+    trailmax = self._trailmax
+    trails = self._trails
+    trailposit = self._trlposition
+
+    pathlist = []
+    for p in self._pathmax:
+      getattr(self, 'path' + str(p)).sort(key = lambda x: x._pthposition, reverse = True)
+      # TODO: use mapping function to get elements of each path to have their
+      # _pthposition be in accordance with their position in the path
+      # for e in getattr(self, 'path' + str(p)):
+      #   pass
+      pathlist.append(getattr(self, 'path' + str(p)))
+      pathlist.sort(key = lambda x: len(x), reverse = True)
+
+    self._nodeid = pathlist[0]._nodeid
+    self._content = pathlist[0]._content
+    del pathlist[0]
+
+    self._trailmax = self._pathmax
+    self._trails = self._paths
+    setattr(self, '_sharedtrail', self._sharedpath)
+    self._trlposition = self._pthposition
+
+    self._pathmax = trailmax
+    self._paths = trails
+    delattr(self, '_sharedpath')
+    self._pthposition = trailposit
 
   def append(self, path, node):
     if not isinstance(path, int):
